@@ -12,9 +12,16 @@ const puppeteer = require('puppeteer');
  */
 async function scrapeGoogleMaps({ keyword, location, maxLeads, onResult, onProgress, shouldStop }) {
   const browser = await puppeteer.launch({
-    headless: process.env.SCRAPER_HEADLESS !== 'false',
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-  });
+  executablePath: puppeteer.executablePath(),
+  headless: true,
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--single-process'
+  ],
+});
 
   const results = [];
   const seen = new Set();
