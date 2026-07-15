@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "seed": "node src/utils/seed.js"
+    "seed": "node src/utils/seed.js",
+    "postinstall": "npx puppeteer browsers install"
   },
 
   "dependencies": {
