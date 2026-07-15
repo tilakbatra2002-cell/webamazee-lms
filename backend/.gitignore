@@ -1,0 +1,7 @@
+node_modules/
+.env
+dist/
+uploads/proposals/*
+!uploads/proposals/.gitkeep
+.DS_Store
+*.log
