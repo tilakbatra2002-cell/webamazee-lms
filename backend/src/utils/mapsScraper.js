@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 /**
  * Scrapes Google Maps search results for a keyword + location.
@@ -11,15 +12,18 @@ const puppeteer = require('puppeteer');
  * modest and add delays between jobs.
  */
 async function scrapeGoogleMaps({ keyword, location, maxLeads, onResult, onProgress, shouldStop }) {
+  console.log("========== PUPPETEER DEBUG ==========");
+console.log("Puppeteer executable:", puppeteer.executablePath());
+console.log("Executable exists:", fs.existsSync(puppeteer.executablePath()));
+console.log("=====================================");
   const browser = await puppeteer.launch({
   executablePath: puppeteer.executablePath(),
   headless: true,
   args: [
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage',
-    '--disable-gpu',
-    '--single-process'
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu"
   ],
 });
 
