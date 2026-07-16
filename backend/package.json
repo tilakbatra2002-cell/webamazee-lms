@@ -13,7 +13,7 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "seed": "node src/utils/seed.js",
-    "postinstall": "npx playwright install"
+    "postinstall": "npx playwright install chromium"
   },
 
   "dependencies": {
