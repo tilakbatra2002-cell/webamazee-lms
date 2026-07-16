@@ -1,5 +1,4 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
+const { chromium } = require("playwright");
 
 /**
  * Scrapes Google Maps search results for a keyword + location.
@@ -12,35 +11,39 @@ const fs = require('fs');
  * modest and add delays between jobs.
  */
 async function scrapeGoogleMaps({ keyword, location, maxLeads, onResult, onProgress, shouldStop }) {
-  console.log("========== PUPPETEER DEBUG ==========");
-console.log("Puppeteer executable:", puppeteer.executablePath());
-console.log("Executable exists:", fs.existsSync(puppeteer.executablePath()));
-console.log("=====================================");
-  const browser = await puppeteer.launch({
-  executablePath: puppeteer.executablePath(),
-  headless: true,
-  args: [
-    "--no-sandbox",
-    "--disable-setuid-sandbox",
-    "--disable-dev-shm-usage",
-    "--disable-gpu"
-  ],
-});
+  console.log("========== PLAYWRIGHT DEBUG ==========");
+  console.log("Launching Chromium via Playwright...");
+  console.log("=======================================");
+
+  const browser = await chromium.launch({
+    headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu"
+    ],
+  });
 
   const results = [];
   const seen = new Set();
 
+  let context;
+
   try {
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36'
-    );
-    await page.setViewport({ width: 1366, height: 900 });
-    page.setDefaultNavigationTimeout(Number(process.env.SCRAPER_NAV_TIMEOUT_MS) || 45000);
+    context = await browser.newContext({
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36',
+      viewport: { width: 1366, height: 900 },
+    });
+
+    const page = await context.newPage();
+    page.setDefaultTimeout(Number(process.env.SCRAPER_NAV_TIMEOUT_MS) || 45000);
+page.setDefaultNavigationTimeout(Number(process.env.SCRAPER_NAV_TIMEOUT_MS) || 45000);
 
     const query = encodeURIComponent(`${keyword} in ${location}`);
     await page.goto(`https://www.google.com/maps/search/${query}`, {
-      waitUntil: 'networkidle2',
+      waitUntil: 'networkidle',
     });
 
     // Wait for results feed panel
@@ -58,7 +61,7 @@ console.log("=====================================");
         const feed = document.querySelector(sel);
         if (feed) feed.scrollBy(0, 1200);
       }, feedSelector);
-      await new Promise((r) => setTimeout(r, 1500));
+      await page.waitForTimeout(1500);
 
       const cards = await page.evaluate((sel) => {
         const feed = document.querySelector(sel);
@@ -77,8 +80,8 @@ console.log("=====================================");
         if (shouldStop && (await shouldStop())) break;
 
         try {
-          const detailPage = await browser.newPage();
-          await detailPage.goto(link, { waitUntil: 'networkidle2', timeout: 30000 });
+          const detailPage = await context.newPage();
+          await detailPage.goto(link, { waitUntil: 'networkidle', timeout: 30000 });
           await detailPage.waitForSelector('h1', { timeout: 10000 }).catch(() => {});
 
           const data = await detailPage.evaluate(() => {
@@ -153,6 +156,7 @@ console.log("=====================================");
       lastCount = uniqueLinks.length;
     }
   } finally {
+    if (context) await context.close();
     await browser.close();
   }
 

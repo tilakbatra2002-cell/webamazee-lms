@@ -13,7 +13,7 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "seed": "node src/utils/seed.js",
-    "postinstall": "npx puppeteer browsers install"
+    "postinstall": "npx playwright install"
   },
 
   "dependencies": {
@@ -28,7 +28,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.14",
-    "puppeteer": "24.15.0",
+    "playwright": "^1.61.1",
     "socket.io": "^4.7.5",
     "uuid": "^9.0.1",
     "validator": "^13.12.0"
