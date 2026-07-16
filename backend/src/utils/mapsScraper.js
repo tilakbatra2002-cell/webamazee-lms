@@ -11,9 +11,14 @@ const { chromium } = require("playwright");
  * modest and add delays between jobs.
  */
 async function scrapeGoogleMaps({ keyword, location, maxLeads, onResult, onProgress, shouldStop }) {
-  console.log("========== PLAYWRIGHT DEBUG ==========");
-  console.log("Launching Chromium via Playwright...");
-  console.log("=======================================");
+ console.log("========== PLAYWRIGHT DEBUG ==========");
+  console.log("PLAYWRIGHT PATH:", process.env.PLAYWRIGHT_BROWSERS_PATH);
+  console.log("CACHE EXISTS:", fs.existsSync("/opt/render/.cache/ms-playwright"));
+  console.log(
+    "CHROMIUM EXISTS:",
+    fs.existsSync("/opt/render/.cache/ms-playwright/chromium-1228")
+  );
+  console.log("======================================");
 
   const browser = await chromium.launch({
     headless: true,
