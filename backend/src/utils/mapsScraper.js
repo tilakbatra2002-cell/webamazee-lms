@@ -1,5 +1,5 @@
 const { chromium } = require("playwright");
-
+const fs = require("fs");
 /**
  * Scrapes Google Maps search results for a keyword + location.
  * Yields results incrementally via onResult callback so the caller can
